@@ -14,11 +14,11 @@ begin
 Clk_tb=0;
 switch_tb = 0;
 reset_tb=0;
-#(CLK_PERIOD*10)
+#(CLK_PERIOD*100)
 reset_tb=1;
-#(CLK_PERIOD*10)
+#(CLK_PERIOD*100)
 reset_tb=0;
-#(CLK_PERIOD*10)
+#(CLK_PERIOD*30)
 switch_tb=1;
 #(CLK_PERIOD*2)
 //switch_tb=0;
@@ -28,5 +28,6 @@ switch_tb=1;
 
 $stop;
 end
-UART_Trans s1 (.CLK100MHZ(Clk_tb), .SW0(reset_tb), .SW1(switch_tb),.UART_RXD_OUT(out));
+UART_Control U1 (.CLK100MHZ(Clk_tb),.SW0(reset_tb), .SW1(switch_tb), .UART_RXD_OUT(out));
+//UART_Trans s1 (.CLK100MHZ(Clk_tb), .SW0(reset_tb), .SW1(switch_tb),.UART_RXD_OUT(out));
 endmodule

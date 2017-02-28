@@ -2,29 +2,22 @@
 
 module UART_Trans(
 	input wire CLK100MHZ,
-	input wire SW0, 
-	input wire SW1, 
+	input wire reset, 
+	input wire isTX, 
+	input wire [7:0] data,
 	output reg UART_RXD_OUT,
 	output reg done
 );
 
 // Variable Declaration
-reg enable;
+reg en;
 reg [4:0] i;
 reg [9:0] counter;
 reg [2:0] state;
-reg done;
 reg [9:0] dout;
 
-wire [7:0] data;
-wire reset;
-wire start;
 
-assign reset = SW0;
-assign start = SW1;
-
-
-assign data = 8'b10101111;
+//assign data = 8'b10101111;
 
 
 localparam
@@ -39,19 +32,19 @@ always @ (posedge CLK100MHZ, posedge reset)
 begin
 	if (reset)
 		begin
-			enable <= 0;
+			en <= 0;
 			counter <= 0;
 		end
-	else if (start)	
+	else if (isTX)	
 		begin
 			if (counter == baudCount)
 				begin
-					enable <= 1;
+					en <= 1;
 					counter <= 0;
 				end
 			else
 				begin
-					enable <= 0;
+					en <= 0;
 					counter <= counter + 1;
 				end
 		end
@@ -64,32 +57,34 @@ begin
 		begin
 			state <= Qini;
 			UART_RXD_OUT <= 1;
+			done <= 0;
 		end
-	else if (start) 
+	else if (isTX) 
 		begin		
 			case(state)
 				Qini:
 				begin
 					state <= Qtrans;
 					i <= 0;
-					dout <= {1'b1, data, 1'b0}; //Preparing the data：{1 stop bit, data, 1 start bit}
+					dout <= {1'b1, data, 1'b0}; //Preparing the data:{1 stop bit, data, 1 start bit}
 
 				end
 				
 				Qtrans:
 				begin
-					if (enable)
+					if (en)
 					begin
 						if (i == 9)
 						begin
 							i <= 0;
 							state <= Qend;
+							done <= 1'b1;
 						end
 						else
 						begin
 							UART_RXD_OUT <= dout[i]; 
 							i <= i + 1;
-							done <= 1'b1;
+							
 
 						end
 					end
