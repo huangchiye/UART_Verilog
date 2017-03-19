@@ -4,7 +4,7 @@ module UART_Control(
 	input wire CLK100MHZ,
 	input wire SW0, 
 	input wire SW1, 
-	output wire UART_RXD_OUT
+	output wire TXD
 );
 
 // Variable Declaration
@@ -29,7 +29,7 @@ assign mem[3]  = 8'hD4;
 parameter data_len = 4;
 
 
-UART_Trans M1 (.CLK100MHZ(CLK100MHZ), .reset(reset), .isTX(isTX), .data(data), .UART_RXD_OUT(UART_RXD_OUT), .done(done));
+UART_Trans #(8) M1 (.CLK100MHZ(CLK100MHZ), .reset(reset), .isTX(isTX), .data(data), .TXD(TXD), .done(done));
 
 
 localparam
@@ -85,3 +85,45 @@ begin
 end
 
 endmodule
+
+module pulse_generator (
+	input CLK100MHZ,
+	input reset,
+	input enable,
+	output reg pulse
+);
+
+reg [9:0] counter;
+parameter baudCount = 868; // For 115200 baud rate: 100e6/115200 = 868   8.68us
+
+always @ (posedge CLK100MHZ, posedge reset) 
+begin
+	if (reset)
+		begin
+			pulse <= 0;
+			counter <= 0;
+		end
+	else if (enable)	
+		begin
+			if (counter == baudCount - 1)
+				begin
+					pulse <= 1;
+					counter <= 0;
+				end
+			else
+				begin
+					pulse <= 0;
+					counter <= counter + 1;
+				end
+		end
+end
+endmodule
+
+module UART_echo(
+	input wire CLK100MHZ,
+	input wire isRX, 
+	input wire isTX, 
+	input wire RXD
+	output wire TXD
+	
+);
