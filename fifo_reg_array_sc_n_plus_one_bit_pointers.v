@@ -10,7 +10,7 @@
 
 module fifo_reg_array_sc (clk, reset, data_in, wen, ren, data_out, depth, empty, full);
 
-parameter DATA_WIDTH = 16;
+parameter DATA_WIDTH = 8;
 parameter ADDR_WIDTH = 4;
 
 input clk, reset;

@@ -2,8 +2,8 @@
 
 module UART_Control(
 	input wire CLK100MHZ,
-	input wire SW0, 
-	input wire SW1, 
+	input wire reset, 
+	input wire start, 
 	output wire TXD
 );
 
@@ -13,12 +13,10 @@ reg [1:0] state;
 reg isTX;
 
 reg [7:0] data;
-wire reset;
-wire start;
 wire done;
 
-assign reset = SW0;
-assign start = SW1;
+//assign reset = SW0;
+//assign start = SW1;
 
 wire [7:0] mem [0:3];
 assign mem[0]  = 8'hA1;
@@ -85,7 +83,7 @@ begin
 end
 
 endmodule
-
+/*
 module pulse_generator (
 	input CLK100MHZ,
 	input reset,
@@ -118,12 +116,6 @@ begin
 		end
 end
 endmodule
+*/
 
-module UART_echo(
-	input wire CLK100MHZ,
-	input wire isRX, 
-	input wire isTX, 
-	input wire RXD
-	output wire TXD
-	
-);
+
